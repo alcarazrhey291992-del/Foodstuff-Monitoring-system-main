@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0038a8">
+  <title>Audit Log · DSWD Sanctuary Center Foodstuff Delivery Monitoring System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./js/audit-log.js"></script>
+</head>
+<body class="audit-body">
+  <main class="main audit-main">
+    <header class="audit-page-header">
+      <div class="brand">
+        <img class="brand-mark" src="./images/logo.png" alt="Sanctuary Center logo">
+        <div class="brand-copy">
+          <strong>Sanctuary Center</strong>
+          <span>Foodstuff monitoring</span>
+        </div>
+      </div>
+      <a class="button button-light" href="./index.html">Back to monthly matrix</a>
+    </header>
+    <section class="official-heading">
+      <img class="official-seal" src="./images/logo.png" alt="">
+      <div>
+        <strong>Department of Social Welfare and Development - Sanctuary Center</strong>
+        <span>Append-only change history · Asia/Manila time</span>
+      </div>
+    </section>
+    <section class="audit-section" aria-labelledby="auditTitle">
+      <div class="section-heading">
+        <div>
+          <h1 id="auditTitle">Audit Log</h1>
+          <p>Review matrix, delivery-date, and catch-up changes.</p>
+        </div>
+      </div>
+      <div class="audit-filters" aria-label="Audit log filters">
+        <label class="audit-filter">
+          <span>From</span>
+          <input class="control" id="auditFromDate" type="date">
+        </label>
+        <label class="audit-filter">
+          <span>To</span>
+          <input class="control" id="auditToDate" type="date">
+        </label>
+        <label class="audit-filter">
+          <span>Who</span>
+          <select class="control" id="auditAuthorFilter">
+            <option value="">All authors</option>
+          </select>
+        </label>
+        <label class="audit-filter">
+          <span>Lot</span>
+          <select class="control" id="auditLotFilter">
+            <option value="">All lots</option>
+          </select>
+        </label>
+      </div>
+      <p class="audit-status" id="auditStatus" role="status" aria-live="polite">Loading audit history…</p>
+      <div class="audit-table-scroll">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th scope="col">When</th>
+              <th scope="col">Who</th>
+              <th scope="col">Lot / Period</th>
+              <th scope="col">Change</th>
+              <th scope="col">Values</th>
+            </tr>
+          </thead>
+          <tbody id="auditRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

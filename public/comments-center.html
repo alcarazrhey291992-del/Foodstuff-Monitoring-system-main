@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0038a8">
+  <title>Comments Center · DSWD Sanctuary Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./js/comments-center.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Application information">
+      <div class="brand">
+        <img class="brand-mark" src="./images/logo.png" alt="Sanctuary Center logo">
+        <div class="brand-copy">
+          <strong>Sanctuary Center</strong>
+          <span>Foodstuff monitoring</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <p class="nav-label">WORKSPACE</p>
+        <a class="nav-current" href="./index.html"><span aria-hidden="true">▦</span> Monthly Matrix</a>
+      </div>
+      <div class="sidebar-note">
+        <strong>Comments Center</strong>
+        <span>Live discussion threads</span>
+      </div>
+      <div class="sidebar-bottom">Department of Social Welfare and Development<br>Sanctuary Center</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar comments-center-topbar">
+        <div class="title-block">
+          <p class="eyebrow">COLLABORATION</p>
+          <h1>Comments Center</h1>
+          <p class="subtitle">Browse, filter, and open cell discussions across months and lots.</p>
+        </div>
+        <a class="button button-light" href="./index.html">Back to monthly matrix</a>
+      </header>
+
+      <section class="comments-filter-section" aria-label="Comment filters">
+        <label class="filter-control"><span>Year</span><select id="filterYear"><option value="">All years</option></select></label>
+        <label class="filter-control"><span>Month</span><select id="filterMonth"><option value="">All months</option></select></label>
+        <label class="filter-control"><span>Lot</span><select id="filterLot"><option value="">All lots</option></select></label>
+        <label class="filter-control"><span>Item</span><select id="filterItem"><option value="">All items</option></select></label>
+        <label class="filter-control"><span>Status</span>
+          <select id="filterStatus">
+            <option value="">Open and resolved</option>
+            <option value="open">Open</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </label>
+        <label class="filter-control"><span>Author</span><select id="filterAuthor"><option value="">All authors</option></select></label>
+        <label class="filter-checkbox"><input id="filterUnread" type="checkbox"> Unread only</label>
+      </section>
+
+      <div class="comments-admin-actions">
+        <button class="button button-danger" id="deleteAllCommentsButton" type="button" hidden>Delete all comments</button>
+      </div>
+      <p id="commentsCenterStatus" class="activity-empty" role="status">Loading comments…</p>
+      <div id="commentsCenterResults" class="comments-center-results"></div>
+    </main>
+  </div>
+</body>
+</html>

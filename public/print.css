@@ -1,0 +1,90 @@
+@page {
+  size: landscape;
+  margin: 12mm;
+}
+
+@media print {
+  body { min-width: 0; color: var(--print-ink); background: var(--white); font: 9pt Arial, sans-serif; }
+  .app-shell { display: block; min-height: 0; }
+  .sidebar, .sidebar-scrim, .topbar, .month-tabs, .toolbar, .date-tools, .matrix-hint, .matrix-card-controls, .view-titlebar, .storage-warning, .dialog, .toast, .lot-tabs, .view-subtabs, .notifications-view, .embedded-view, .configuration-view, .export-view { display: none !important; }
+  .content-view:not(.matrix-view) { display: none !important; }
+  .matrix-view { display: block !important; }
+  .app-shell.overview-print .content-view[data-app-view="overview"] { display: block !important; margin: 0; padding: 0; border: 0; }
+  .app-shell.overview-print .matrix-view { display: none !important; }
+  .app-shell.overview-print .overview-controls, .app-shell.overview-print .lot-summary-grid { display: none !important; }
+  .app-shell.overview-print .overview-empty { border: 0; padding: 8px 0; }
+  .app-shell.overview-print .summary-table-scroll { max-height: none; overflow: visible; margin-top: 8px; }
+  .app-shell.overview-print .summary-table { width: 100%; min-width: 0; table-layout: fixed; font-size: 6.5pt; }
+  .app-shell.overview-print .summary-table thead { display: table-header-group; }
+  .app-shell.overview-print .summary-table thead th:nth-child(1) { width: 17%; }
+  .app-shell.overview-print .summary-table thead th:nth-child(2) { width: 6%; }
+  .app-shell.overview-print .summary-table thead th:nth-child(3) { width: 8%; }
+  .app-shell.overview-print .summary-table thead th:nth-child(4),
+  .app-shell.overview-print .summary-table thead th:nth-child(5),
+  .app-shell.overview-print .summary-table thead th:nth-child(7) { width: 9%; }
+  .app-shell.overview-print .summary-table thead th:nth-child(6),
+  .app-shell.overview-print .summary-table thead th:nth-child(8) { width: 10%; }
+  .app-shell.overview-print .summary-table thead th:nth-child(9) { width: 22%; }
+  .app-shell.overview-print .summary-table th, .app-shell.overview-print .summary-table td {
+    min-width: 0 !important;
+    padding: 3px;
+    border: 1px solid var(--print-border);
+    color: var(--print-ink) !important;
+    background: var(--white) !important;
+    font-size: 6.5pt;
+    overflow-wrap: anywhere;
+  }
+  .app-shell.overview-print .summary-table .summary-lot-heading th,
+  .app-shell.overview-print .summary-table .summary-lot-subtotal th,
+  .app-shell.overview-print .summary-table .summary-lot-subtotal td,
+  .app-shell.overview-print .summary-table tfoot th,
+  .app-shell.overview-print .summary-table tfoot td { background: #e8f0fa !important; }
+  .app-shell.overview-print .summary-status { padding: 0; color: var(--print-ink); background: transparent; }
+  .app-shell.overview-print .summary-item-link { min-height: 0; color: var(--print-ink); text-decoration: none; }
+  .app-shell.overview-print .summary-table tr { break-inside: avoid; }
+  .cell-comment-trigger { display: none !important; }
+  .audit-page-header, .audit-filters { display: none !important; }
+  .comment-open > .cell-comment-trigger, .comment-resolved > .cell-comment-trigger {
+    display: inline-flex !important;
+    width: 7px;
+    min-width: 7px;
+    height: 7px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0;
+    opacity: 1;
+  }
+  .comment-open > .cell-comment-trigger { border-color: var(--comment-marker); background: var(--comment-marker); }
+  .comment-resolved > .cell-comment-trigger { border-color: var(--comment-resolved-border); background: var(--comment-resolved-border); }
+  .comment-target.comment-open, .comment-target.comment-resolved {
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  .main { max-width: none; margin: 0; padding: 0; }
+  .official-heading { min-height: 0; margin: 0 0 12px; padding: 0 0 8px; border: 0; border-bottom: 2px solid var(--blue); border-radius: 0; box-shadow: none; }
+  .official-seal { display: none; }
+  .official-heading strong { color: var(--print-ink); font-size: 14pt; }
+  .official-heading span { color: var(--print-muted); font-size: 10pt; }
+  .matrix-section { margin: 0; }
+  .matrix-heading { margin-bottom: 7px; }
+  .matrix-heading h2 { color: var(--print-ink); font-size: 12pt; }
+  .matrix-heading p { display: none; }
+  .matrix-entry-panel { margin: 0; border: 0; }
+  .panel-titlebar { display: none; }
+  .matrix-tools { margin: 0; padding: 0 0 6px; border: 0; }
+  .matrix-scroll { max-height: none; overflow: visible; border: 0; }
+  .matrix-table { width: 100%; min-width: 0; font-size: 7pt; }
+  .matrix-table.card-mode { display: table; }
+  .matrix-table.card-mode tbody { display: table-row-group; }
+  .matrix-table.card-mode tbody tr[data-item-id] { display: table-row !important; }
+  .matrix-table.card-mode tbody tr[data-item-id] td { display: table-cell !important; }
+  .matrix-table.card-mode tbody tr[data-item-id] td::before { content: none; }
+  .matrix-table th, .matrix-table td { position: static !important; padding: 3px; border: 1px solid var(--print-border); color: var(--print-ink) !important; background: var(--white) !important; font-size: 7pt; }
+  .matrix-table thead tr:first-child th, .matrix-table thead tr:nth-child(2) th { position: static; }
+  .matrix-table input, .matrix-table select { min-width: 0; min-height: 0; padding: 0; border: 0; color: var(--print-ink); background: transparent; font-size: 7pt; }
+  .matrix-table .item-input { min-width: 0; }
+  .date-actions, .matrix-table .cell-action { display: none; }
+  .status-label, .item-history, .empty-history { font-size: 6pt; }
+  .matrix-table tfoot td { position: static !important; background: var(--total-cell) !important; }
+  .matrix-table tr { break-inside: avoid; }
+}

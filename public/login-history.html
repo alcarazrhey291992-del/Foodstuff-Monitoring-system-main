@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0038a8">
+  <title>Login History · DSWD Sanctuary Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./js/login-history.js"></script>
+</head>
+<body class="audit-body">
+  <main class="main audit-main">
+    <header class="audit-page-header">
+      <div class="brand">
+        <img class="brand-mark" src="./images/logo.png" alt="Sanctuary Center logo">
+        <div class="brand-copy">
+          <strong>Sanctuary Center</strong>
+          <span>Foodstuff monitoring</span>
+        </div>
+      </div>
+      <a class="button button-light" href="./index.html">Back to monthly matrix</a>
+    </header>
+    <section class="official-heading">
+      <img class="official-seal" src="./images/logo.png" alt="">
+      <div>
+        <strong>Department of Social Welfare and Development - Sanctuary Center</strong>
+        <span>Account activity · Asia/Manila time</span>
+      </div>
+    </section>
+    <section class="audit-section" aria-labelledby="loginHistoryTitle">
+      <div class="section-heading">
+        <div>
+          <h1 id="loginHistoryTitle">Administrator access</h1>
+          <p>Review access requests and account activity.</p>
+        </div>
+      </div>
+      <nav class="admin-tabs" aria-label="Administrator tools">
+        <a class="admin-tab active" href="./login-history.html" aria-current="page">Login History <span id="pendingRequestBadge" class="count-badge">0</span></a>
+        <a class="admin-tab" href="./users-access.html">Users &amp; Access</a>
+      </nav>
+      <section class="admin-panel" aria-labelledby="pendingRequestsTitle">
+        <div class="panel-section-heading">
+          <h2 id="pendingRequestsTitle">Pending Access Requests</h2>
+          <span id="pendingRequestsCount" class="count-badge">0</span>
+        </div>
+        <p class="audit-status" id="pendingRequestsStatus" role="status">Loading requests…</p>
+        <div id="pendingRequests" class="admin-record-list"></div>
+      </section>
+      <section class="admin-panel" aria-labelledby="historyTitle">
+        <h2 id="historyTitle">Login History</h2>
+        <div class="admin-filters">
+          <label class="period-control"><span>Email</span><input class="control" id="filterEmail" type="search"></label>
+          <label class="period-control"><span>Event</span>
+            <select class="control" id="filterEvent">
+              <option value="">All events</option>
+              <option value="request">Request</option>
+              <option value="login">Login</option>
+              <option value="logout">Logout</option>
+            </select>
+          </label>
+          <label class="period-control"><span>From</span><input class="control" id="filterFromDate" type="date"></label>
+          <label class="period-control"><span>To</span><input class="control" id="filterToDate" type="date"></label>
+        </div>
+        <p class="audit-status" id="historyStatus" role="status">Loading login history…</p>
+        <div class="audit-table-scroll">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th scope="col">Date &amp; time</th>
+                <th scope="col">Email</th>
+                <th scope="col">Name</th>
+                <th scope="col">Role</th>
+                <th scope="col">Event</th>
+                <th scope="col">Device</th>
+              </tr>
+            </thead>
+            <tbody id="loginHistoryRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

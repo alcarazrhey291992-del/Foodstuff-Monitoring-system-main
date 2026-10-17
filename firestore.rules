@@ -1,0 +1,129 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function email() { return request.auth.token.email.lower(); }
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function gateHash() {
+      return get(/databases/$(database)/documents/config/gate).data.hash;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && email() in ['asanctuary171@gmail.com', 'sc.foncr@dswd.gov.ph'];
+    }
+
+    function isMember() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/members/$(email()))
+        && get(/databases/$(database)/documents/members/$(email())).data.status == 'approved'
+        && get(/databases/$(database)/documents/members/$(email())).data.hash == gateHash();
+    }
+
+    function canUseApp() {
+      return isAdmin() || isMember();
+    }
+
+    // Password hash: admins only
+    match /config/gate {
+      allow read, write: if isAdmin();
+    }
+
+    match /members/{memberEmail} {
+      allow read: if isAdmin() || (signedIn() && email() == memberEmail);
+
+      allow create: if signedIn()
+        && email() == memberEmail
+        && request.resource.data.status == 'pending'
+        && request.resource.data.hash == gateHash();
+
+      allow update: if isAdmin()
+        || (signedIn() && email() == memberEmail
+            && request.resource.data.status == resource.data.status
+            && request.resource.data.hash == gateHash()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hash', 'lastLogin']));
+
+      allow delete: if isAdmin();
+    }
+
+    match /loginLogs/{id} {
+      allow create: if signedIn()
+        && request.resource.data.email == email()
+        && (isAdmin() || isMember() || request.resource.data.event == 'request');
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /config/units {
+      allow read, write: if canUseApp();
+    }
+
+    match /matrices/{matrixId} {
+      allow read, write: if canUseApp();
+
+      match /items/{itemId} {
+        allow read, write: if canUseApp();
+      }
+      match /deliveryDates/{dateId} {
+        allow read, write: if canUseApp();
+      }
+      match /entries/{entryId} {
+        allow read, write: if canUseApp();
+      }
+      match /catchUpDeliveries/{deliveryId} {
+        allow read, write: if canUseApp();
+      }
+      match /itemNames/{itemNameId} {
+        allow read, write: if canUseApp();
+      }
+      match /comments/{commentId} {
+        allow read: if canUseApp();
+        allow create: if canUseApp()
+          && request.resource.data.authorName == email()
+          && request.resource.data.text is string;
+        allow update: if canUseApp() && (
+          (
+            resource.data.authorName.lower() == email()
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['text', 'editedBy', 'editedAt'])
+            && request.resource.data.editedBy == email()
+            && request.resource.data.text is string
+          )
+          || request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'resolvedBy', 'resolvedAt'])
+        );
+        allow delete: if canUseApp()
+          && (isAdmin() || resource.data.authorName.lower() == email());
+
+        match /replies/{replyId} {
+          allow read: if canUseApp();
+          allow create: if canUseApp()
+            && request.resource.data.authorName == email()
+            && request.resource.data.text is string;
+          allow update: if canUseApp()
+            && resource.data.authorName.lower() == email()
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['text', 'editedBy', 'editedAt'])
+            && request.resource.data.editedBy == email()
+            && request.resource.data.text is string;
+          allow delete: if canUseApp()
+            && (
+              isAdmin()
+              || resource.data.authorName.lower() == email()
+              || get(/databases/$(database)/documents/matrices/$(matrixId)/comments/$(commentId)).data.authorName.lower() == email()
+            );
+        }
+      }
+    }
+
+    match /notifications/{notificationId} {
+      allow read, write: if canUseApp();
+    }
+
+    match /auditLogs/{auditLogId} {
+      allow read, write: if canUseApp();
+    }
+  }
+}

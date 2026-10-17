@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0038a8">
+  <title>DSWD Sanctuary Center Foodstuff Delivery Monitoring System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./print.css" media="print">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <main class="auth-screen" id="authScreen">
+    <section class="auth-card" aria-labelledby="authTitle">
+      <img class="auth-logo" src="./images/logo.png" alt="Sanctuary Center logo">
+      <p class="eyebrow auth-eyebrow">SECURE WORKSPACE</p>
+      <h1 id="authTitle">Sign in to continue</h1>
+      <p class="auth-copy">Sign in with your Google account to continue.</p>
+      <button class="button button-primary auth-button" id="googleSignInButton" type="button">Sign in with Google</button>
+      <form id="memberPasswordForm" hidden>
+        <label class="field-label" for="memberPasswordInput">Shared workspace password</label>
+        <input class="control full-control" id="memberPasswordInput" type="password" autocomplete="current-password" required>
+        <button class="button button-primary auth-button" type="submit">Continue</button>
+      </form>
+      <button class="button button-light auth-button" id="authSignOutButton" type="button" hidden>Sign out</button>
+      <p class="auth-error" id="authMessage" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <div class="app-shell" id="appShell" hidden>
+    <button class="sidebar-scrim" id="sidebarScrim" type="button" aria-label="Close navigation" tabindex="-1"></button>
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation" aria-hidden="true">
+      <div class="sidebar-heading">
+        <div class="brand">
+          <img class="brand-mark" src="./images/logo.png" alt="Sanctuary Center logo">
+          <div class="brand-copy">
+            <strong>Sanctuary Center</strong>
+            <span>Foodstuff monitoring</span>
+          </div>
+        </div>
+        <button class="icon-button sidebar-close" id="sidebarCloseButton" type="button" aria-label="Close navigation">×</button>
+      </div>
+      <div class="profile-card">
+        <img class="profile-photo" id="profilePhoto" alt="" hidden>
+        <div class="profile-copy">
+          <strong id="profileName">Signed in</strong>
+          <span id="profileEmail"></span>
+          <small id="profileLoginTime"></small>
+        </div>
+      </div>
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="sidebar-nav" aria-label="Workspace views">
+        <a class="sidebar-link" href="#matrix" data-view-link="matrix"><span aria-hidden="true">▦</span> Monthly Matrix</a>
+        <a class="sidebar-link" href="#overview" data-view-link="overview"><span aria-hidden="true">▤</span> Monthly Overview / Summary</a>
+        <a class="sidebar-link" href="#comments" data-view-link="comments"><span aria-hidden="true">◉</span> Comments Center</a>
+        <a class="sidebar-link" href="#notifications" data-view-link="notifications"><span aria-hidden="true">♧</span> Notifications <span class="count-badge" id="sidebarNotificationBadge">0</span></a>
+        <a class="sidebar-link admin-nav-link" id="loginHistoryLink" href="#login-history" data-view-link="login-history" hidden><span aria-hidden="true">◷</span> Login History</a>
+        <a class="sidebar-link admin-nav-link" id="usersAccessLink" href="#users" data-view-link="users" hidden><span aria-hidden="true">♙</span> Users &amp; Access</a>
+        <a class="sidebar-link" href="#config" data-view-link="config"><span aria-hidden="true">⚙</span> Configuration (units)</a>
+        <a class="sidebar-link admin-nav-link" id="sidebarChangePasswordButton" href="#password" data-view-link="password" hidden><span aria-hidden="true">⌑</span> Change password</a>
+        <a class="sidebar-link" href="#export" data-view-link="export"><span aria-hidden="true">⇩</span> Print / Export</a>
+        <a class="sidebar-link admin-nav-link" id="auditLogLink" href="#audit" data-view-link="audit" hidden><span aria-hidden="true">☷</span> Audit Log</a>
+      </nav>
+      <div class="sidebar-bottom">Department of Social Welfare and Development<br>Sanctuary Center</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-toggle" id="menuToggleButton" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">☰</button>
+          <nav class="year-tabs" aria-label="Select year">
+            <button class="year-tab" type="button" data-year="2026">2026</button>
+            <button class="year-tab" type="button" data-year="2027">2027</button>
+            <button class="year-tab" type="button" data-year="2028">2028</button>
+            <button class="year-tab" type="button" data-year="2029">2029</button>
+            <button class="year-tab" type="button" data-year="2030">2030</button>
+            <button class="button button-top-add" id="addYearButton" type="button" aria-label="Add year">+</button>
+          </nav>
+          <select id="yearSelect" aria-label="Select year" hidden></select>
+        </div>
+        <div class="top-actions">
+          <button class="button button-export" id="exportButton" type="button">Export CSV</button>
+          <button class="button button-notifications" id="commentsPanelToggle" type="button" aria-expanded="false">Notifications <span id="notificationButtonBadge" class="count-badge">0</span></button>
+          <div class="account-controls">
+            <span id="signedInEmail" class="account-email" aria-live="polite"></span>
+            <button class="button button-light" id="changeAppPasswordButton" type="button" hidden>Change password</button>
+            <button class="sign-out-link" id="signOutButton" type="button">Sign Out</button>
+            <label class="freeze-control" for="freezeHeaderToggle"><input id="freezeHeaderToggle" type="checkbox"> Freeze header</label>
+            <label class="freeze-control" for="freezePanesToggle"><input id="freezePanesToggle" type="checkbox"> Freeze panes</label>
+          </div>
+        </div>
+      </header>
+
+      <section class="official-heading" aria-label="Official document heading">
+        <img class="official-seal" src="./images/logo.png" alt="Department of Social Welfare and Development - Sanctuary Center logo">
+        <div>
+          <div class="official-titleline">
+            <strong>FOODSTUFF DELIVERY MONITORING</strong>
+            <b class="selected-year-heading" id="selectedYearHeading"></b>
+          </div>
+          <span>Department of Social Welfare and Development - Sanctuary Center</span>
+          <span class="visually-hidden" id="periodHeading"></span>
+        </div>
+      </section>
+
+      <nav class="month-tabs" aria-label="Select month">
+        <button class="month-tab" type="button" data-month="1">January</button>
+        <button class="month-tab" type="button" data-month="2">February</button>
+        <button class="month-tab" type="button" data-month="3">March</button>
+        <button class="month-tab" type="button" data-month="4">April</button>
+        <button class="month-tab" type="button" data-month="5">May</button>
+        <button class="month-tab" type="button" data-month="6">June</button>
+        <button class="month-tab" type="button" data-month="7">July</button>
+        <button class="month-tab" type="button" data-month="8">August</button>
+        <button class="month-tab" type="button" data-month="9">September</button>
+        <button class="month-tab" type="button" data-month="10">October</button>
+        <button class="month-tab" type="button" data-month="11">November</button>
+        <button class="month-tab" type="button" data-month="12">December</button>
+      </nav>
+      <select id="monthSelect" aria-label="Select month" hidden></select>
+
+      <section class="content-view matrix-view" data-app-view="matrix">
+        <header class="view-titlebar">
+          <h2>Monthly Matrix</h2>
+          <p id="matrixViewState" class="view-state" role="status" aria-live="polite">Loading matrix data…</p>
+        </header>
+        <nav class="lot-tabs" id="lotTabs" aria-label="Foodstuff lots"></nav>
+        <nav class="view-subtabs" aria-label="Matrix sections">
+          <a href="#matrix" data-view-link="matrix">Matrix</a>
+          <a href="#overview" data-view-link="overview">Undelivered / Catch-up Logs</a>
+        </nav>
+        <section class="matrix-section" aria-labelledby="matrixTitle">
+          <div class="section-heading matrix-heading">
+            <div>
+              <h2 id="matrixTitle">Monthly market order matrix</h2>
+              <p id="lotDescription"></p>
+            </div>
+            <div class="toolbar matrix-toolbar">
+              <button class="button button-light" id="copyPreviousButton" type="button">Copy previous month items</button>
+            </div>
+          </div>
+          <section class="matrix-entry-panel" aria-labelledby="matrixEntryTitle">
+            <h3 class="panel-titlebar" id="matrixEntryTitle">MATRIX ENTRY</h3>
+            <div class="matrix-tools">
+              <div class="table-caption">
+                <strong id="activeLotHeading"></strong>
+                <span id="itemCount"></span>
+              </div>
+              <div class="date-tools">
+                <label for="deliveryDateInput">New delivery date</label>
+                <input class="control" id="deliveryDateInput" type="date">
+                <button class="button button-primary" id="addDateButton" type="button">+ Add date column</button>
+                <button class="button button-primary" id="addItemButton" type="button">+ Add item</button>
+              </div>
+            </div>
+          </section>
+          <div class="matrix-card-controls" id="matrixCardControls">
+            <div class="matrix-view-switch" role="group" aria-label="Matrix display mode">
+              <button class="button button-light matrix-mode active" type="button" data-matrix-mode="table" aria-pressed="true">Table view</button>
+              <button class="button button-light matrix-mode" type="button" data-matrix-mode="card" aria-pressed="false">Card view</button>
+            </div>
+            <div class="matrix-card-navigation" id="matrixCardNavigation" hidden>
+              <button class="button button-light" id="previousMatrixCard" type="button" aria-label="Previous item">Previous</button>
+              <span id="matrixCardPosition" role="status"></span>
+              <button class="button button-light" id="nextMatrixCard" type="button" aria-label="Next item">Next</button>
+            </div>
+          </div>
+          <div class="matrix-scroll" id="matrixScroll" tabindex="0" aria-label="Scrollable delivery matrix">
+            <table class="matrix-table" id="matrixTable">
+              <caption class="visually-hidden">Market order and delivery quantities</caption>
+              <thead id="matrixHead"></thead>
+              <tbody id="matrixBody"></tbody>
+              <tfoot id="matrixFoot"></tfoot>
+            </table>
+          </div>
+          <p class="matrix-hint">Tip: Use the arrow keys to move between editable cells. Right-click a cell or use its + marker to comment. Quantities and prices must be zero or greater.</p>
+        </section>
+      </section>
+
+      <section class="content-view summary-section" data-app-view="overview" aria-labelledby="summaryTitle" hidden>
+        <header class="view-titlebar">
+          <h2>Monthly Overview / Summary</h2>
+          <p id="overviewViewState" class="view-state" role="status" aria-live="polite">Loading monthly overview…</p>
+        </header>
+        <div class="section-heading overview-heading">
+          <div>
+            <h2 id="summaryTitle">Monthly item delivery</h2>
+            <p id="overviewPeriod"></p>
+          </div>
+        </div>
+        <div class="lot-summary-grid" id="lotSummary"></div>
+        <div class="overview-controls" aria-label="Filter and export overview">
+          <div class="overview-status-filters" role="group" aria-label="Filter items by delivery status">
+            <button class="button button-light active" type="button" data-overview-status="all" aria-pressed="true">All items</button>
+            <button class="button button-light" type="button" data-overview-status="undelivered" aria-pressed="false">Undelivered only</button>
+            <button class="button button-light" type="button" data-overview-status="partial" aria-pressed="false">Partially delivered</button>
+            <button class="button button-light" type="button" data-overview-status="fully" aria-pressed="false">Fully delivered</button>
+          </div>
+          <label class="overview-search">
+            <span>Search item</span>
+            <input class="control" id="overviewItemSearch" type="search" autocomplete="off" placeholder="Search item name">
+          </label>
+          <label class="overview-lot-filter">
+            <span>Lot</span>
+            <select class="control" id="overviewLotFilter">
+              <option value="">All lots</option>
+            </select>
+          </label>
+          <button class="button button-export" id="overviewExportButton" type="button">Export CSV</button>
+          <button class="button button-light" id="overviewPrintButton" type="button">Print / Save PDF</button>
+        </div>
+        <p class="overview-empty" id="overviewEmptyState" role="status" aria-live="polite" hidden></p>
+        <div class="summary-table-scroll">
+          <table class="audit-table summary-table" id="overviewTable">
+            <caption class="visually-hidden">Item delivery summary for the selected month</caption>
+            <thead>
+              <tr>
+                <th scope="col">Item name</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Unit price (PHP)</th>
+                <th scope="col">Ordered quantity</th>
+                <th scope="col">Delivered quantity</th>
+                <th scope="col">Delivered amount (PHP)</th>
+                <th scope="col">Undelivered quantity</th>
+                <th scope="col">Undelivered amount (PHP)</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="summaryRows"></tbody>
+            <tfoot id="summaryFoot"></tfoot>
+          </table>
+        </div>
+      </section>
+
+      <section class="content-view notifications-view" id="commentsPanel" data-app-view="notifications" hidden>
+        <header class="view-titlebar">
+          <div>
+            <h2>Notifications <span id="notificationBadge" class="count-badge">0</span></h2>
+            <button class="text-button" id="markAllNotificationsReadButton" type="button">Mark all read</button>
+          </div>
+          <button class="icon-button" id="closeCommentsPanelButton" type="button" aria-label="Close notifications view">×</button>
+        </header>
+        <p id="notificationsViewState" class="view-state" role="status" aria-live="polite">Loading notifications…</p>
+        <div id="notificationList" class="activity-list"></div>
+        <section class="current-comments-section" aria-labelledby="currentCommentsTitle">
+          <h3 id="currentCommentsTitle">This lot’s comments</h3>
+          <div id="currentCommentsList" class="activity-list"></div>
+        </section>
+      </section>
+
+      <section class="content-view embedded-view" data-app-view="comments" hidden aria-label="Comments Center">
+        <header class="view-titlebar"><h2>Comments Center</h2><p id="commentsViewState" class="view-state" role="status" aria-live="polite">Loading comments…</p></header>
+        <iframe title="Comments Center" data-src="./comments-center.html"></iframe>
+      </section>
+      <section class="content-view embedded-view admin-embedded-view" data-app-view="login-history" hidden aria-label="Login History">
+        <header class="view-titlebar"><h2>Login History</h2><p id="loginHistoryViewState" class="view-state" role="status" aria-live="polite">Loading login history…</p></header>
+        <iframe title="Login History" data-src="./login-history.html"></iframe>
+      </section>
+      <section class="content-view embedded-view admin-embedded-view" data-app-view="users" hidden aria-label="Users and Access">
+        <header class="view-titlebar"><h2>Users &amp; Access</h2><p id="usersViewState" class="view-state" role="status" aria-live="polite">Loading members…</p></header>
+        <iframe title="Users and Access" data-src="./users-access.html"></iframe>
+      </section>
+
+      <section class="content-view configuration-view" data-app-view="config" hidden>
+        <header class="view-titlebar"><h2>Configuration</h2></header>
+        <p class="view-description">Manage measurement units used by all lots.</p>
+        <p id="configViewState" class="view-state" role="status" aria-live="polite">Loading configuration…</p>
+        <form id="configUnitForm" class="configuration-unit-form">
+          <label class="field-label" for="configNewUnit">Add measurement unit</label>
+          <input class="control" id="configNewUnit" type="text" maxlength="24" autocomplete="off" placeholder="e.g. Bundle" required>
+          <button class="button button-primary" type="submit">Add unit</button>
+        </form>
+        <ul class="unit-list configuration-unit-list" id="configurationUnits"></ul>
+        <h3 class="configuration-subtitle">Foodstuff lots</h3>
+        <ul class="configuration-lots" id="configurationLots"></ul>
+      </section>
+
+      <section class="content-view password-view" data-app-view="password" hidden>
+        <header class="view-titlebar"><h2>Change shared password</h2></header>
+        <p class="view-description">All non-admin members will need to enter the new password again.</p>
+        <p id="passwordViewState" class="view-state" role="status" aria-live="polite"></p>
+        <form id="changePasswordForm" class="password-form">
+          <label class="field-label" for="newSharedPassword">New password</label>
+          <input class="control" id="newSharedPassword" type="password" minlength="8" autocomplete="new-password" required>
+          <label class="field-label" for="confirmSharedPassword">Confirm new password</label>
+          <input class="control" id="confirmSharedPassword" type="password" minlength="8" autocomplete="new-password" required>
+          <button class="button button-primary" type="submit">Save password</button>
+        </form>
+      </section>
+
+      <section class="content-view export-view" data-app-view="export" hidden>
+        <header class="view-titlebar"><h2>Print / Export</h2></header>
+        <p class="view-description">Export the selected lot or back up all workspace data.</p>
+        <p id="exportViewState" class="view-state" role="status" aria-live="polite"></p>
+        <div class="export-actions">
+          <button class="button button-export" id="exportCurrentLotButton" type="button">Export current lot CSV</button>
+          <button class="button button-light" id="exportAllDataButton" type="button">Export all data</button>
+          <button class="button button-primary" id="printButton" type="button">Print / Save PDF</button>
+        </div>
+      </section>
+
+      <section class="content-view embedded-view admin-embedded-view" data-app-view="audit" hidden aria-label="Audit Log">
+        <header class="view-titlebar"><h2>Audit Log</h2><p id="auditViewState" class="view-state" role="status" aria-live="polite">Loading audit history…</p></header>
+        <iframe title="Audit Log" data-src="./audit-log.html"></iframe>
+      </section>
+      <section class="content-view access-restricted-view" data-app-view="restricted" hidden>
+        <header class="view-titlebar"><h2>Access restricted</h2></header>
+        <p class="view-state state-error" role="alert">Access restricted. This view is available to administrators only.</p>
+      </section>
+      <p class="storage-warning" role="note">This workspace syncs data and discussions through Firebase for authorized Google accounts. Do not enter sensitive or resident information.</p>
+    </main>
+  </div>
+
+  <dialog id="catchupDialog" class="dialog">
+    <form id="catchupForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">CATCH-UP DELIVERY</p>
+          <h2>Log delivered quantity</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeCatchupButton" aria-label="Close">×</button>
+      </div>
+      <p class="dialog-item" id="catchupItemName"></p>
+      <p class="remaining-note">Remaining undelivered quantity: <strong id="catchupRemaining"></strong></p>
+      <input id="catchupItemId" type="hidden">
+      <label class="field-label" for="catchupDate">Date delivered</label>
+      <input class="control full-control" id="catchupDate" type="date" required>
+      <label class="field-label" for="catchupQty">Quantity delivered</label>
+      <input class="control full-control" id="catchupQty" type="number" min="0.000001" step="any" required>
+      <label class="field-label" for="catchupReceivedBy">Received by</label>
+      <input class="control full-control" id="catchupReceivedBy" type="text" maxlength="120" autocomplete="off" required>
+      <label class="field-label" for="catchupRemarks">Remarks <span>(optional)</span></label>
+      <textarea class="control full-control remarks-control" id="catchupRemarks" rows="3" maxlength="500"></textarea>
+      <div class="dialog-actions">
+        <button class="button button-light" id="cancelCatchupButton" type="button">Cancel</button>
+        <button class="button button-primary" type="submit">Save delivery record</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="unitDialog" class="dialog">
+    <form id="unitForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">CONFIGURATION</p>
+          <h2>Manage measurement units</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeUnitButton" aria-label="Close">×</button>
+      </div>
+      <p class="section-note">Add units to the dropdown used by all lots.</p>
+      <label class="field-label" for="newUnitInput">New unit</label>
+      <div class="unit-entry">
+        <input class="control" id="newUnitInput" type="text" maxlength="24" autocomplete="off" placeholder="e.g. Bundle">
+        <button class="button button-primary" type="submit">Add unit</button>
+      </div>
+      <ul class="unit-list" id="unitList"></ul>
+      <div class="dialog-actions">
+        <button class="button button-light" id="doneUnitsButton" type="button">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="yearDialog" class="dialog">
+    <form id="yearForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">NEW MONTHLY WORKSPACE</p>
+          <h2>Add a year</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeYearButton" aria-label="Close">×</button>
+      </div>
+      <p class="section-note">Add any year from 2026 onward. The selected month will open as a separate blank matrix.</p>
+      <label class="field-label" for="newYearInput">Year</label>
+      <input class="control full-control" id="newYearInput" type="number" min="2026" max="9999" step="1" required>
+      <div class="dialog-actions">
+        <button class="button button-light" id="cancelYearButton" type="button">Cancel</button>
+        <button class="button button-primary" type="submit">Add year</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="exportDataDialog" class="dialog">
+    <form id="exportDataForm">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">BACKUP</p>
+          <h2>Export all data</h2>
+        </div>
+        <button class="icon-button" type="button" id="closeExportDataButton" aria-label="Close">×</button>
+      </div>
+      <p class="section-note">Export matrix entries, collaboration discussions, notifications, units, and audit history.</p>
+      <label class="field-label" for="exportDataYear">Year range</label>
+      <select class="control full-control" id="exportDataYear"></select>
+      <div class="dialog-actions">
+        <button class="button button-light" id="cancelExportDataButton" type="button">Cancel</button>
+        <button class="button button-light" type="submit" data-export-format="csv">Export CSV</button>
+        <button class="button button-primary" type="submit" data-export-format="json">Export JSON</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="commentDialog" class="dialog comment-dialog">
+    <div class="dialog-heading">
+      <div>
+        <p class="eyebrow">CELL DISCUSSION</p>
+        <h2 id="commentDialogTitle">Comments</h2>
+      </div>
+      <button class="icon-button" id="closeCommentDialogButton" type="button" aria-label="Close">×</button>
+    </div>
+    <form id="newCommentForm">
+      <label class="field-label" for="newCommentText">Add a comment</label>
+      <textarea class="control full-control remarks-control" id="newCommentText" rows="3" maxlength="2000" required></textarea>
+      <div class="dialog-actions">
+        <button class="button button-primary" type="submit">Post comment</button>
+      </div>
+    </form>
+    <div id="commentThreads" class="comment-threads" aria-live="polite"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

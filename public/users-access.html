@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0038a8">
+  <title>Users &amp; Access · DSWD Sanctuary Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./js/users-access.js"></script>
+</head>
+<body class="audit-body">
+  <main class="main audit-main">
+    <header class="audit-page-header">
+      <div class="brand">
+        <img class="brand-mark" src="./images/logo.png" alt="Sanctuary Center logo">
+        <div class="brand-copy">
+          <strong>Sanctuary Center</strong>
+          <span>Foodstuff monitoring</span>
+        </div>
+      </div>
+      <a class="button button-light" href="./index.html">Back to monthly matrix</a>
+    </header>
+    <section class="official-heading">
+      <img class="official-seal" src="./images/logo.png" alt="">
+      <div>
+        <strong>Department of Social Welfare and Development - Sanctuary Center</strong>
+        <span>Member access management</span>
+      </div>
+    </section>
+    <section class="audit-section" aria-labelledby="usersAccessTitle">
+      <div class="section-heading">
+        <div>
+          <h1 id="usersAccessTitle">Users &amp; Access</h1>
+          <p>Review member status, last login, and access controls.</p>
+        </div>
+      </div>
+      <nav class="admin-tabs" aria-label="Administrator tools">
+        <a class="admin-tab" href="./login-history.html">Login History</a>
+        <a class="admin-tab active" href="./users-access.html" aria-current="page">Users &amp; Access</a>
+      </nav>
+      <p class="audit-status" id="usersStatus" role="status">Loading members…</p>
+      <div class="audit-table-scroll">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th scope="col">Member</th>
+              <th scope="col">Email</th>
+              <th scope="col">Status</th>
+              <th scope="col">Last login</th>
+              <th scope="col">Access</th>
+            </tr>
+          </thead>
+          <tbody id="memberRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
