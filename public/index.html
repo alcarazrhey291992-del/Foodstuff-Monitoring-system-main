@@ -25,6 +25,7 @@
         <input class="control full-control" id="memberPasswordInput" type="password" autocomplete="current-password" required>
         <button class="button button-primary auth-button" type="submit">Continue</button>
       </form>
+      <button class="button button-primary auth-button" id="requestAccessButton" type="button" hidden>Request access</button>
       <button class="button button-light auth-button" id="authSignOutButton" type="button" hidden>Sign out</button>
       <p class="auth-error" id="authMessage" role="status" aria-live="polite"></p>
     </section>
@@ -281,6 +282,14 @@
         <header class="view-titlebar"><h2>Change shared password</h2></header>
         <p class="view-description">All non-admin members will need to enter the new password again.</p>
         <p id="passwordViewState" class="view-state" role="status" aria-live="polite"></p>
+        <section class="admin-panel" aria-labelledby="gatePolicyTitle">
+          <h3 id="gatePolicyTitle">Member password requirement</h3>
+          <label class="filter-checkbox">
+            <input id="requirePasswordToggle" type="checkbox" checked disabled>
+            Require the shared password for non-admin members
+          </label>
+          <p id="gatePolicyState" class="view-state" role="status" aria-live="polite">Loading setting…</p>
+        </section>
         <form id="changePasswordForm" class="password-form">
           <label class="field-label" for="newSharedPassword">New password</label>
           <input class="control" id="newSharedPassword" type="password" minlength="8" autocomplete="new-password" required>

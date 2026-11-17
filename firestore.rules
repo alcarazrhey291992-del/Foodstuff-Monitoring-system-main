@@ -10,6 +10,13 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/config/gate).data.hash;
     }
 
+    // Fails closed: the shared password is required unless an admin
+    // explicitly saved config/gatePolicy with required == false.
+    function gateRequired() {
+      return !exists(/databases/$(database)/documents/config/gatePolicy)
+        || get(/databases/$(database)/documents/config/gatePolicy).data.required != false;
+    }
+
     function isAdmin() {
       return signedIn()
         && email() in ['asanctuary171@gmail.com', 'sc.foncr@dswd.gov.ph'];
@@ -19,7 +26,10 @@ service cloud.firestore {
       return signedIn()
         && exists(/databases/$(database)/documents/members/$(email()))
         && get(/databases/$(database)/documents/members/$(email())).data.status == 'approved'
-        && get(/databases/$(database)/documents/members/$(email())).data.hash == gateHash();
+        && (
+          !gateRequired()
+          || get(/databases/$(database)/documents/members/$(email())).data.hash == gateHash()
+        );
     }
 
     function canUseApp() {
@@ -31,13 +41,24 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Password on/off switch: any signed-in user can read it (the login
+    // screen needs it), only admins can change it.
+    match /config/gatePolicy {
+      allow read: if signedIn();
+      allow create, update: if isAdmin()
+        && request.resource.data.required is bool;
+      allow delete: if false;
+    }
+
     match /members/{memberEmail} {
       allow read: if isAdmin() || (signedIn() && email() == memberEmail);
 
       allow create: if signedIn()
         && email() == memberEmail
         && request.resource.data.status == 'pending'
-        && request.resource.data.hash == gateHash();
+        && request.resource.data.keys().hasOnly(
+          ['email', 'displayName', 'photoURL', 'hash', 'status', 'requestedAt'])
+        && (!gateRequired() || request.resource.data.hash == gateHash());
 
       allow update: if isAdmin()
         || (signedIn() && email() == memberEmail

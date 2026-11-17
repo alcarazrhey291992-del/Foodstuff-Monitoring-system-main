@@ -703,3 +703,6 @@ input[type="search"] { background: var(--search-highlight); }
   .matrix-entry-panel .matrix-tools { padding: 9px; }
   .date-tools .button { flex: 1 1 100%; }
 }
+.admin-panel h3 { margin: 0 0 10px; color: var(--blue-dark); font: 700 15px Manrope, sans-serif; }
+.filter-checkbox { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+.filter-checkbox input { width: 18px; height: 18px; }

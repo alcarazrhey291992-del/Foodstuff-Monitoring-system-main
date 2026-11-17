@@ -64,6 +64,28 @@ export async function getMember(email) {
   return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
 }
 
+const gatePolicyRef = doc(db, "config", "gatePolicy");
+
+// Fail closed: the password is required unless an admin explicitly turned it off.
+export async function isPasswordRequired() {
+  try {
+    const snapshot = await getDoc(gatePolicyRef);
+    return !(snapshot.exists() && snapshot.data().required === false);
+  } catch (error) {
+    console.error(error?.code ?? "unknown", error?.message ?? String(error));
+    return true;
+  }
+}
+
+export async function setPasswordRequired(email, required) {
+  if (!isAdminEmail(email)) throw new Error("Only administrators can change this setting.");
+  await setDoc(gatePolicyRef, {
+    required: Boolean(required),
+    updatedBy: normalizeEmail(email),
+    updatedAt: serverTimestamp()
+  });
+}
+
 export async function changeSharedPassword(email, password) {
   if (!isAdminEmail(email)) throw new Error("Only administrators can change the password.");
   if (password.length < 8) throw new Error("Use a password with at least 8 characters.");
@@ -91,8 +113,13 @@ export async function requireAppAccess(adminOnly = false) {
     }
 
     const member = await getMember(email);
+    const passwordRequired = await isPasswordRequired();
     const storedHash = localStorage.getItem(`dswd-foodstuff-member-hash:${email}`);
-    if (!member || member.status !== "approved" || !storedHash || storedHash !== member.hash) {
+    if (
+      !member
+      || member.status !== "approved"
+      || (passwordRequired && (!storedHash || storedHash !== member.hash))
+    ) {
       window.location.replace("./index.html");
       return false;
     }

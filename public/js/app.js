@@ -20,10 +20,12 @@ import {
   getMember,
   hashPassword,
   isAdminEmail,
+  isPasswordRequired,
   LOGIN_SESSION_KEY,
   memberRefFor,
   normalizeEmail,
   onAuthStateChanged,
+  setPasswordRequired,
   signInWithGoogle,
   signOutUser
 } from "./auth.js";
@@ -1562,7 +1564,17 @@ function setAuthMessage(message) {
   document.getElementById("authMessage").textContent = message;
 }
 
+function showRequestAccess(message) {
+  document.getElementById("googleSignInButton").hidden = true;
+  document.getElementById("memberPasswordForm").hidden = true;
+  document.getElementById("requestAccessButton").hidden = false;
+  document.getElementById("requestAccessButton").disabled = false;
+  document.getElementById("authSignOutButton").hidden = false;
+  setAuthMessage(message);
+}
+
 function showPasswordForm(message) {
+  document.getElementById("requestAccessButton").hidden = true;
   document.getElementById("googleSignInButton").hidden = true;
   document.getElementById("memberPasswordForm").hidden = false;
   document.getElementById("authSignOutButton").hidden = false;
@@ -1571,6 +1583,7 @@ function showPasswordForm(message) {
 }
 
 function showGoogleSignIn(message = "") {
+  document.getElementById("requestAccessButton").hidden = true;
   document.getElementById("googleSignInButton").hidden = false;
   document.getElementById("memberPasswordForm").hidden = true;
   document.getElementById("authSignOutButton").hidden = true;
@@ -1597,6 +1610,21 @@ async function logEntryOnce(user, role) {
   localStorage.setItem(LOGIN_SESSION_KEY, user.uid);
 }
 
+async function loadGatePolicyToggle() {
+  const toggle = document.getElementById("requirePasswordToggle");
+  const stateLine = document.getElementById("gatePolicyState");
+  try {
+    toggle.checked = await isPasswordRequired();
+    toggle.disabled = false;
+    stateLine.textContent = toggle.checked
+      ? "Members must enter the shared password to request access and to sign in."
+      : "Members only need a verified Google account. Every request still needs administrator approval.";
+  } catch (error) {
+    handleError(error);
+    stateLine.textContent = "Unable to load this setting.";
+  }
+}
+
 async function activateApp(user, role) {
   try {
     const email = normalizeEmail(user.email);
@@ -1620,6 +1648,7 @@ async function activateApp(user, role) {
     document.getElementById("usersAccessLink").hidden = role !== "admin";
     document.getElementById("sidebarChangePasswordButton").hidden = role !== "admin";
     document.getElementById("auditLogLink").hidden = role !== "admin";
+    if (role === "admin") loadGatePolicyToggle();
     document.querySelector(".app-shell").hidden = false;
     document.getElementById("authScreen").hidden = true;
     if (!window.location.hash) {
@@ -1677,7 +1706,9 @@ async function refreshPendingAccess(user) {
     }
     if (member.status === "approved") {
       clearPendingAccessPoll();
-      if (pendingPasswordHash) {
+      if (!(await isPasswordRequired())) {
+        window.location.reload();
+      } else if (pendingPasswordHash) {
         await completeMemberEntry(user, pendingPasswordHash, true);
       } else {
         showPasswordForm("Access approved. Enter the shared password to continue.");
@@ -1718,11 +1749,51 @@ async function logAccessRequest(user) {
 
 function waitingForApproval(user, passwordHash = "", message = "Waiting for administrator approval.") {
   pendingPasswordHash = passwordHash;
+  document.getElementById("requestAccessButton").hidden = true;
   document.getElementById("googleSignInButton").hidden = true;
   document.getElementById("memberPasswordForm").hidden = true;
   document.getElementById("authSignOutButton").hidden = false;
   setAuthMessage(message);
   startPendingAccessPoll(user);
+}
+
+// Used only while the shared-password requirement is switched off.
+async function submitAccessRequest() {
+  if (!currentUser) return;
+  const user = currentUser;
+  const email = normalizeEmail(user.email);
+  const button = document.getElementById("requestAccessButton");
+  button.disabled = true;
+  try {
+    setAuthMessage("Sending request…");
+    if (await getMember(email)) {
+      await handleAuthState(user);
+      return;
+    }
+    try {
+      await setDoc(memberRefFor(email), {
+        email,
+        displayName: user.displayName || email,
+        photoURL: user.photoURL || "",
+        hash: "",
+        status: "pending",
+        requestedAt: serverTimestamp()
+      });
+    } catch (error) {
+      if (isPermissionDenied(error)) {
+        button.disabled = false;
+        setAuthMessage("The administrator changed the sign-in settings. Reload the page and try again.");
+        return;
+      }
+      throw error;
+    }
+    await logAccessRequest(user);
+    waitingForApproval(user, "", "Request sent. Waiting for administrator approval.");
+  } catch (error) {
+    button.disabled = false;
+    handleError(error);
+    setAuthMessage(error instanceof Error ? error.message : "Unable to send the request.");
+  }
 }
 
 async function submitMemberPassword(event) {
@@ -1832,12 +1903,17 @@ async function handleAuthState(user) {
   if (generation !== authStateGeneration) return;
   document.getElementById("googleSignInButton").hidden = true;
   document.getElementById("memberPasswordForm").hidden = true;
+  document.getElementById("requestAccessButton").hidden = true;
   setAuthMessage("Checking access…");
   try {
-    const member = await getMember(email);
+    const [member, passwordRequired] = await Promise.all([getMember(email), isPasswordRequired()]);
     if (generation !== authStateGeneration) return;
     if (!member) {
-      showPasswordForm("Enter the shared workspace password to request access.");
+      if (passwordRequired) {
+        showPasswordForm("Enter the shared workspace password to request access.");
+      } else {
+        showRequestAccess("Click Request access. An administrator will review your request.");
+      }
       return;
     }
     if (member.status === "pending") {
@@ -1853,6 +1929,11 @@ async function handleAuthState(user) {
       messageAfterSignOut = "This account has an invalid access status. Contact the administrator.";
       showGoogleSignIn("This account has an invalid access status. Contact the administrator.");
       await signOutUser();
+      return;
+    }
+
+    if (!passwordRequired) {
+      await activateApp(user, "member");
       return;
     }
 
@@ -1980,6 +2061,29 @@ function setupEvents() {
     }
   });
   document.getElementById("memberPasswordForm").addEventListener("submit", submitMemberPassword);
+  document.getElementById("requestAccessButton").addEventListener("click", submitAccessRequest);
+  document.getElementById("requirePasswordToggle").addEventListener("change", async event => {
+    const toggle = event.currentTarget;
+    const stateLine = document.getElementById("gatePolicyState");
+    const wanted = toggle.checked;
+    if (!wanted && !window.confirm("Turn OFF the shared password? Anyone with a verified Google account will be able to send an access request. You still approve or reject each one.")) {
+      toggle.checked = true;
+      return;
+    }
+    toggle.disabled = true;
+    try {
+      await setPasswordRequired(currentUser.email, wanted);
+      stateLine.textContent = wanted
+        ? "Password required. Members approved while it was off will be asked for it once."
+        : "Password off. New requests only need a verified Google account and your approval.";
+    } catch (error) {
+      toggle.checked = !wanted;
+      stateLine.textContent = error instanceof Error ? error.message : "Unable to save this setting.";
+      handleError(error);
+    } finally {
+      toggle.disabled = false;
+    }
+  });
   document.getElementById("signOutButton").addEventListener("click", async () => {
     const user = currentUser;
     let logError = null;
