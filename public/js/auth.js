@@ -14,7 +14,7 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-export const ADMINS = ["asanctuary171@gmail.com", "sc.foncr@dswd.gov.ph"];
+export const ADMINS = ["asanctuary171@gmail.com", "sc.foncr@dswd.gov.ph", "mmobileaseph@gmail.com"];
 export const ADMIN_EMAIL = ADMINS[0];
 export const LOGIN_SESSION_KEY = "dswd-foodstuff-login-session";
 export const authReady = setPersistence(auth, browserLocalPersistence);
