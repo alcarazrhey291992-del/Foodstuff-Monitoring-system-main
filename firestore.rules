@@ -17,9 +17,9 @@ service cloud.firestore {
         || get(/databases/$(database)/documents/config/gatePolicy).data.required != false;
     }
 
-    function isAdmin() {
+        function isAdmin() {
       return signedIn()
-        && email() in ['asanctuary171@gmail.com', 'sc.foncr@dswd.gov.ph'];
+        && email() in ['asanctuary171@gmail.com', 'sc.foncr@dswd.gov.ph', 'mmobileaseph@gmail.com'];
     }
 
     function isMember() {
